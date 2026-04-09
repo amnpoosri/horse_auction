@@ -4,7 +4,12 @@
     "slug": "horse-auction",
     "version": "1.0.0",
     "orientation": "portrait",
-    "platforms": ["ios", "android", "web", "windows"],
+    "platforms": [
+      "ios",
+      "android",
+      "web",
+      "windows"
+    ],
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
@@ -25,6 +30,9 @@
     },
     "windows": {
       "package": "com.horseauction.app"
-    }
+    },
+    "plugins": [
+      "expo-asset"
+    ]
   }
 }

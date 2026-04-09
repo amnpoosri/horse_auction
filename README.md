@@ -1,71 +1,92 @@
 # Horse Auction
 
-A horse auction platform built with Expo (React Native) for cross-platform support (Android, iOS, Windows) and Node.js/Express for the backend API.
+A real-time horse auction platform with interactive 3D horse models, anonymous bidding, and 24-hour countdown timers. Built with Expo (React Native Web) and Node.js/Express.
+
+## Features
+
+- **Interactive 3D Horse Models** — procedural Three.js horses that reflect each horse's coat color (Bay, Grey, Black, Palomino, Chestnut, Buckskin, etc.) with drag-to-rotate controls
+- **Anonymous Bidding** — quick-bid buttons (+$100 / +$500 / +$1K / +$5K) and custom bid input
+- **24-Hour Auctions** — live HH:MM:SS countdown timers on every card
+- **Start Auction** — create new auctions with horse details and starting price
+- **Responsive UI** — 1-column on mobile, 2 on tablet, 3 on desktop
+- **Auto-Refresh** — auction data updates every 5 seconds
 
 ## Project Structure
 
 ```
 horse_auction/
-├── frontend/          # Expo React Native app (Android, iOS, Windows)
+├── frontend/          # Expo React Native app (Web)
+│   ├── App.tsx        # Full auction UI + 3D horse renderer
+│   └── package.json
 └── backend/           # Node.js/Express API server
+    └── src/
+        ├── index.js   # Express server entry point
+        └── routes/
+            ├── auctions.js  # Auction CRUD + bidding (in-memory store)
+            ├── horses.js
+            └── users.js
 ```
 
-## Frontend
+## Quick Start
 
-Built with [Expo](https://expo.dev/) using React Native with TypeScript. Supports:
-- 📱 Android
-- 🍎 iOS
-- 🪟 Windows (via react-native-windows)
-- 🌐 Web
-
-### Setup & Run
-
-```bash
-cd frontend
-npm install
-npm start          # Start Expo dev server
-npm run android    # Run on Android
-npm run ios        # Run on iOS
-npm run windows    # Run on Windows
-npm run web        # Run on Web
-```
-
-## Backend
-
-Built with [Node.js](https://nodejs.org/) and [Express](https://expressjs.com/), with MongoDB via Mongoose.
-
-### Setup & Run
+### Backend
 
 ```bash
 cd backend
 npm install
-cp .env.example .env   # Configure your environment variables
-npm run dev            # Development with nodemon
-npm start              # Production
+node src/index.js      # Starts on port 3000
 ```
 
-### API Endpoints
+### Frontend
+
+```bash
+cd frontend
+npm install
+npx expo start --web   # Starts on port 8081
+```
+
+> **Codespaces**: Ports are auto-detected. Set port 3000 to public:
+> ```bash
+> gh codespace ports visibility 3000:public -c "$CODESPACE_NAME"
+> ```
+
+## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/` | Health check |
-| GET | `/api/horses` | List all horses |
-| POST | `/api/horses` | Create a horse |
-| GET | `/api/horses/:id` | Get a horse |
-| PUT | `/api/horses/:id` | Update a horse |
-| DELETE | `/api/horses/:id` | Delete a horse |
 | GET | `/api/auctions` | List all auctions |
-| POST | `/api/auctions` | Create an auction |
-| GET | `/api/auctions/:id` | Get an auction |
+| GET | `/api/auctions/:id` | Get auction details |
+| POST | `/api/auctions` | Create a new auction |
+| POST | `/api/auctions/:id/bids` | Place an anonymous bid |
 | PUT | `/api/auctions/:id` | Update an auction |
 | DELETE | `/api/auctions/:id` | Delete an auction |
-| GET | `/api/users` | List all users |
-| POST | `/api/users` | Create a user |
-| GET | `/api/users/:id` | Get a user |
-| PUT | `/api/users/:id` | Update a user |
-| DELETE | `/api/users/:id` | Delete a user |
+
+### Create Auction
+
+```json
+POST /api/auctions
+{
+  "horseName": "Thunder Bolt",
+  "breed": "Thoroughbred",
+  "age": 5,
+  "color": "Bay",
+  "description": "A powerful racehorse",
+  "startingPrice": 15000
+}
+```
+
+### Place Bid
+
+```json
+POST /api/auctions/:id/bids
+{
+  "amount": 16000
+}
+```
 
 ## Tech Stack
 
-- **Frontend**: Expo, React Native, TypeScript, react-native-windows
-- **Backend**: Node.js, Express, MongoDB, Mongoose
+- **Frontend**: Expo SDK 52, React Native Web, TypeScript, Three.js
+- **Backend**: Node.js, Express, CORS, in-memory data store
+- **3D**: Three.js with MeshPhysicalMaterial, studio lighting, shadow mapping
