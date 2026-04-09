@@ -817,6 +817,11 @@ function AuctionDetailModal({
         <View style={[styles.detailModal, isWide && { width: 560 }]}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <HorseImage uri={auction.image} height={280} horseColor={auction.color} />
+            {auction.status === 'sold' && (
+              <View style={styles.detailSoldBadge}>
+                <Text style={styles.detailSoldBadgeText}>SOLD</Text>
+              </View>
+            )}
             <TouchableOpacity style={styles.detailCloseBtn} onPress={onClose}>
               <Text style={styles.detailCloseTxt}>✕</Text>
             </TouchableOpacity>
@@ -830,15 +835,26 @@ function AuctionDetailModal({
               </View>
               <Text style={styles.detailDesc}>{auction.description}</Text>
 
-              <View style={styles.detailTimerWrap}>
-                <Text style={styles.detailTimerLabel}>AUCTION ENDS IN</Text>
-                <CountdownDisplay endsAt={auction.endsAt} />
-              </View>
+              {auction.status === 'sold' ? (
+                <View style={styles.detailTimerWrap}>
+                  <Text style={styles.detailTimerLabel}>AUCTION COMPLETED</Text>
+                  <Text style={styles.detailSoldDate}>
+                    {new Date(auction.soldDate || auction.endsAt).toLocaleDateString('en-US', {
+                      year: 'numeric', month: 'long', day: 'numeric',
+                    })}
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.detailTimerWrap}>
+                  <Text style={styles.detailTimerLabel}>AUCTION ENDS IN</Text>
+                  <CountdownDisplay endsAt={auction.endsAt} />
+                </View>
+              )}
 
               <View style={styles.detailBidInfo}>
                 <View style={styles.detailBidCol}>
-                  <Text style={styles.detailBidLabel}>Current Bid</Text>
-                  <Text style={styles.detailBidValue}>${auction.currentBid.toLocaleString()}</Text>
+                  <Text style={styles.detailBidLabel}>{auction.status === 'sold' ? 'Final Price' : 'Current Bid'}</Text>
+                  <Text style={[styles.detailBidValue, auction.status === 'sold' && styles.detailBidValueSold]}>${auction.currentBid.toLocaleString()}</Text>
                 </View>
                 <View style={styles.detailBidCol}>
                   <Text style={styles.detailBidLabel}>Starting</Text>
@@ -1031,7 +1047,7 @@ const soldStyles = StyleSheet.create({
     borderColor: '#334155',
     ...(Platform.OS === 'web' ? { boxShadow: '0 2px 12px rgba(0,0,0,0.25)' } : { elevation: 4 }),
   },
-  imageWrap: { position: 'relative' },
+  imageWrap: { position: 'relative', overflow: 'hidden' },
   overlay: {
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
@@ -1039,12 +1055,13 @@ const soldStyles = StyleSheet.create({
   },
   soldRibbon: {
     position: 'absolute',
-    top: 14,
-    right: -30,
+    top: 16,
+    right: -28,
     backgroundColor: '#dc2626',
-    paddingHorizontal: 40,
-    paddingVertical: 5,
+    paddingHorizontal: 36,
+    paddingVertical: 6,
     transform: [{ rotate: '35deg' }],
+    zIndex: 2,
   },
   soldRibbonText: { color: '#fff', fontSize: 11, fontWeight: '800', letterSpacing: 2 },
   body: { padding: 14 },
@@ -1336,6 +1353,29 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   detailImage: { width: '100%', height: 280 },
+  detailSoldBadge: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    backgroundColor: '#dc2626',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 8,
+    zIndex: 10,
+  },
+  detailSoldBadgeText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+  },
+  detailSoldDate: {
+    fontSize: 16,
+    color: '#fbbf24',
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  detailBidValueSold: { color: '#fbbf24' },
   detailCloseBtn: {
     position: 'absolute',
     top: 16,
